@@ -27,6 +27,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * A map assigning {@link Integer} values to {@link BooleanAssignment} keys.
+ *
+ * @author Christopher Rau
+ */
 public class BooleanAssignmentValueMap implements Iterable<Map.Entry<BooleanAssignment, Integer>> {
 
     protected final VariableMap variableMap;
@@ -93,5 +98,13 @@ public class BooleanAssignmentValueMap implements Iterable<Map.Entry<BooleanAssi
     @Override
     public Iterator<Map.Entry<BooleanAssignment, Integer>> iterator() {
         return booleanAssignmentValues.entrySet().iterator();
+    }
+
+    /**
+     * Combines all {@link BooleanAssignment} keys of the map to a {@link BooleanAssignmentList}.
+     * @return the combined {@link BooleanAssignmentList}
+     */
+    public BooleanAssignmentList getBooleanAssignmentList() {
+        return new BooleanAssignmentList(variableMap, getAssignments());
     }
 }

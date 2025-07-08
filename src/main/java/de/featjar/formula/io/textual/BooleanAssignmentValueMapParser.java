@@ -30,11 +30,29 @@ import de.featjar.formula.assignment.BooleanAssignment;
 import de.featjar.formula.assignment.BooleanAssignmentValueMap;
 import java.util.*;
 
+/**
+ * Parser for serializing and parsing a {@link BooleanAssignmentValueMap}.
+ *
+ * @author Christopher Rau
+ */
 public class BooleanAssignmentValueMapParser {
 
     private static final char VALUE_SEPARATOR = '=';
     private static final char LITERAL_SEPARATOR = ',';
 
+    /**
+     * Parses a textual representation of a {@link BooleanAssignmentValueMap}.
+     * <BR>
+     * Each line corresponds to one entry, with
+     * '=' as the value separator. Left of the '=', a {@link BooleanAssignment} is represented as a list of
+     * comma-seperated literals. Negative literals have a '-' as prefix, while positive literals either have no prefix or
+     * '+'. All further '-' and '+' chars are interpreted as part of the literal name. To the right of the '=', a {@link Integer}
+     * provides the value corresponding to the {@link BooleanAssignment} key.
+     * <BR>
+     * Line example: 'literal1,+literal2,-literal3=value'.
+     * @param inputMapper {@link AInputMapper} providing the textual representation.
+     * @return The corresponding {@link BooleanAssignmentValueMap} wrapped in a {@link Result}
+     */
     public Result<BooleanAssignmentValueMap> parse(AInputMapper inputMapper) {
         Map<BooleanAssignment, Integer> assignmentValueMap = new HashMap<>();
         VariableMap variableMap = new VariableMap();
@@ -87,6 +105,19 @@ public class BooleanAssignmentValueMapParser {
         return Result.of(map, problems);
     }
 
+    /**
+     * Serializes a {@link BooleanAssignmentValueMap} into a {@link String}.
+     * <BR>
+     * Each line corresponds to one entry, with
+     * '=' as the value separator. Left of the '=', a {@link BooleanAssignment} is represented as a list of
+     * comma-seperated literals. Negative literals have a '-' as prefix, while positive literals either have no prefix or
+     * '+'. All further '-' and '+' chars are interpreted as part of the literal name. To the right of the '=', a {@link Integer}
+     * provides the value corresponding to the {@link BooleanAssignment} key.
+     * <BR>
+     * Line example: 'literal1,+literal2,-literal3=value'.
+     * @param booleanAssignmentValueMap {@link BooleanAssignmentValueMap} to be serialized.
+     * @return The corresponding {@link String} wrapped in a {@link Result}
+     */
     public Result<String> serialize(BooleanAssignmentValueMap booleanAssignmentValueMap) {
         VariableMap variableMap = booleanAssignmentValueMap.getVariableMap();
         List<String> stringList = new ArrayList<>();
@@ -96,6 +127,11 @@ public class BooleanAssignmentValueMapParser {
             LinkedHashMap<Integer, Boolean> literals = entry.getKey().getAll();
             for (Integer literal : literals.keySet()) {
                 String literalString = variableMap.get(literal).orElseLog(Log.Verbosity.WARNING);
+                if (literals.get(literal)) {
+                    stringBuilder.append("+");
+                } else {
+                    stringBuilder.append("-");
+                }
                 stringBuilder.append(literalString).append(LITERAL_SEPARATOR);
             }
             if (stringBuilder.charAt(stringBuilder.length() - 1) == LITERAL_SEPARATOR) {
