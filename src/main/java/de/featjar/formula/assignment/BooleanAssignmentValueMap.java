@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A map assigning {@link Integer} values to {@link BooleanAssignment} keys.
@@ -40,6 +41,12 @@ import java.util.Set;
  * @author Christopher Rau
  */
 public class BooleanAssignmentValueMap implements Iterable<Map.Entry<BooleanAssignment, Integer>> {
+
+    public ValuedBooleanAssignmentList toValuedBooleanAssignmentList() {
+        return booleanAssignmentValues.entrySet().stream()
+                .map(entry -> new ValuedBooleanAssignment(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toCollection(ValuedBooleanAssignmentList::new));
+    }
 
     public static final class EmptyComputation extends AComputation<BooleanAssignmentValueMap> {
 
@@ -57,7 +64,7 @@ public class BooleanAssignmentValueMap implements Iterable<Map.Entry<BooleanAssi
         }
     }
 
-    protected final VariableMap variableMap;
+    protected VariableMap variableMap;
     protected final Map<BooleanAssignment, Integer> booleanAssignmentValues;
 
     public BooleanAssignmentValueMap(VariableMap variableMap, Map<BooleanAssignment, Integer> booleanAssignmentValues) {
@@ -129,5 +136,21 @@ public class BooleanAssignmentValueMap implements Iterable<Map.Entry<BooleanAssi
      */
     public BooleanAssignmentList getBooleanAssignmentList() {
         return new BooleanAssignmentList(variableMap, getAssignments());
+    }
+
+    /**
+     * Changes the {@link VariableMap variable map} and calls {@link BooleanAssignment#adapt(VariableMap, VariableMap, boolean)} for every assignment in this list.
+     * This does not create a copy of this list, but directly changes each assignment.
+     *
+     * @param newVariables the new variable map
+     * @param integrateOldVariables whether variable names from the old variable map are added to the new variable map, if missing
+     * @return this list
+     */
+    public BooleanAssignmentValueMap adapt(VariableMap newVariables, boolean integrateOldVariables) {
+        booleanAssignmentValues
+                .keySet()
+                .forEach(assignment -> assignment.adapt(variableMap, newVariables, integrateOldVariables));
+        variableMap = newVariables;
+        return this;
     }
 }

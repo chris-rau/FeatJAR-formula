@@ -55,6 +55,7 @@ import java.util.stream.Collectors;
  * @author Elias Kuiter
  */
 public class VariableMap extends RangeMap<String> {
+
     public VariableMap() {}
 
     public VariableMap(Collection<String> variableNames) {
