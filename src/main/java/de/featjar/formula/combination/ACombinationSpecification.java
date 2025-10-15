@@ -21,12 +21,16 @@
 package de.featjar.formula.combination;
 
 import de.featjar.formula.VariableMap;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+/**
+ * Abstract implementation of {@link ICombinationSpecification} using a single list of elements build combination with a given size.
+ */
 public abstract class ACombinationSpecification implements ICombinationSpecification {
 
     protected int t;
@@ -40,6 +44,12 @@ public abstract class ACombinationSpecification implements ICombinationSpecifica
 
     protected ACombinationSpecification(int t) {
         setT(t);
+    }
+
+    protected ACombinationSpecification(ACombinationSpecification other) {
+        t = other.t;
+        elements = Arrays.copyOf(other.elements, other.elements.length);
+        variableMap = other.variableMap;
     }
 
     public int t() {

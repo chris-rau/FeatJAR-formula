@@ -87,7 +87,7 @@ public abstract class AComputeTWiseCoverage extends AComputation<CoverageStatist
 
         if (!Objects.equals(referenceVariableMap, sampleVariableMap)) {
             FeatJAR.log().warning("Variable maps of given sample and reference are different.");
-            VariableMap mergedVariableMap = VariableMap.merge(sampleVariableMap, referenceVariableMap);
+            VariableMap mergedVariableMap = new VariableMap(sampleVariableMap, referenceVariableMap);
             adaptToMergedVariableMap(mergedVariableMap);
         }
         combinationSet.adapt(sample.getVariableMap());
@@ -117,7 +117,7 @@ public abstract class AComputeTWiseCoverage extends AComputation<CoverageStatist
     public Result<CoverageStatistic> compute(List<Object> dependencyList, Progress progress) {
         init(dependencyList);
 
-        SampleBitIndex sampleIndex = new SampleBitIndex(sample.getAll(), sample.getVariableMap());
+        SampleBitIndex sampleIndex = new SampleBitIndex(sample);
 
         progress.setTotalSteps(combinationSet.loopCount());
 

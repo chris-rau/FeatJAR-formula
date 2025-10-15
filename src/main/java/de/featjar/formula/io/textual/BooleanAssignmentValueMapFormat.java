@@ -39,7 +39,7 @@ public class BooleanAssignmentValueMapFormat implements IFormat<BooleanAssignmen
     }
 
     @Override
-    public boolean supportsSerialize() {
+    public boolean supportsWrite() {
         return true;
     }
 

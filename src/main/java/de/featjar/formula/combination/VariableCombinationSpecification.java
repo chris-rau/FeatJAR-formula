@@ -20,6 +20,7 @@
  */
 package de.featjar.formula.combination;
 
+import de.featjar.base.FeatJAR;
 import de.featjar.base.computation.AComputation;
 import de.featjar.base.computation.Computations;
 import de.featjar.base.computation.Dependency;
@@ -84,6 +85,15 @@ public class VariableCombinationSpecification extends ACombinationSpecification 
         super(t);
     }
 
+    public VariableCombinationSpecification(VariableCombinationSpecification other) {
+        super(other);
+    }
+
+    @Override
+    public VariableCombinationSpecification copy() {
+        return new VariableCombinationSpecification(this);
+    }
+
     public void forEach(Consumer<int[]> consumer) {
         final int[] gray = Ints.grayCode(t);
         SingleLexicographicIterator.stream(elements, t).forEach(combination -> {
@@ -107,6 +117,17 @@ public class VariableCombinationSpecification extends ACombinationSpecification 
         });
     }
 
+    public void forEachParallel(Consumer<int[]> consumer) {
+        final int[] gray = Ints.grayCode(t);
+        SingleLexicographicIterator.parallelStream(elements, t).forEach(combination -> {
+            final int[] combinationLiterals = combination.select();
+            for (int g : gray) {
+                consumer.accept(combinationLiterals);
+                combinationLiterals[g] = -combinationLiterals[g];
+            }
+        });
+    }
+
     public <V> void forEachParallel(BiConsumer<V, int[]> consumer, Supplier<V> environmentCreator) {
         final int[] gray = Ints.grayCode(t);
         SingleLexicographicIterator.parallelStream(elements, t, environmentCreator)
@@ -122,7 +143,12 @@ public class VariableCombinationSpecification extends ACombinationSpecification 
 
     @Override
     public long loopCount() {
-        return 1 << t * BinomialCalculator.computeBinomial(elements.length, t);
+        try {
+            return Math.multiplyExact(1 << t, BinomialCalculator.computeBinomial(elements.length, t));
+        } catch (ArithmeticException e) {
+            FeatJAR.log().warning("Long overflow for combination count. Using Long.MAX_VALUE.");
+            return Long.MAX_VALUE;
+        }
     }
 
     @Override

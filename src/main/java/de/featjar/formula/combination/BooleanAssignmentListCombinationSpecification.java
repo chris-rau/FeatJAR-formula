@@ -29,6 +29,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+/**
+ * Specification that describes combinations by a predefined list.
+ */
 public class BooleanAssignmentListCombinationSpecification implements ICombinationSpecification {
 
     public BooleanAssignmentList booleanAssignmentList;
@@ -62,6 +65,11 @@ public class BooleanAssignmentListCombinationSpecification implements ICombinati
         booleanAssignmentList.stream()
                 .map(IntegerList::get)
                 .forEach(assignment -> consumer.accept(environmentCreator.get(), assignment));
+    }
+
+    @Override
+    public void forEachParallel(Consumer<int[]> consumer) {
+        booleanAssignmentList.stream().parallel().map(IntegerList::get).forEach(consumer);
     }
 
     @Override

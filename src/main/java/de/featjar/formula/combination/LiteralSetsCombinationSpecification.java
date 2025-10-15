@@ -20,6 +20,7 @@
  */
 package de.featjar.formula.combination;
 
+import de.featjar.base.FeatJAR;
 import de.featjar.base.data.BinomialCalculator;
 import de.featjar.base.data.MultiLexicographicIterator;
 import de.featjar.formula.VariableMap;
@@ -63,8 +64,15 @@ public class LiteralSetsCombinationSpecification extends ASetsCombinationSpecifi
                 });
     }
 
+    @Override
+    public void forEachParallel(Consumer<int[]> consumer) {
+        MultiLexicographicIterator.stream(elementSets, tValues).forEach(combination -> {
+            consumer.accept(combination.select());
+        });
+    }
+
     public <V> void forEachParallel(BiConsumer<V, int[]> consumer, Supplier<V> environmentCreator) {
-        MultiLexicographicIterator.parallelStream(elementSets, tValues, environmentCreator)
+        MultiLexicographicIterator.stream(elementSets, tValues, environmentCreator)
                 .forEach(combination -> {
                     consumer.accept(combination.environment(), combination.select());
                 });
@@ -72,11 +80,17 @@ public class LiteralSetsCombinationSpecification extends ASetsCombinationSpecifi
 
     @Override
     public long loopCount() {
-        int count = 1;
-        for (int i = 0; i < elementSets.length; i++) {
-            count *= BinomialCalculator.computeBinomial(elementSets[i].length, tValues[i]);
+        try {
+            long count = 1;
+            for (int i = 0; i < elementSets.length; i++) {
+                count = Math.multiplyExact(
+                        count, BinomialCalculator.computeBinomial(elementSets[i].length, tValues[i]));
+            }
+            return count;
+        } catch (ArithmeticException e) {
+            FeatJAR.log().warning("Long overflow for combination count. Using Long.MAX_VALUE.");
+            return Long.MAX_VALUE;
         }
-        return count;
     }
 
     @Override
