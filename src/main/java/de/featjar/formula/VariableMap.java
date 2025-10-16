@@ -56,7 +56,6 @@ import java.util.stream.Collectors;
  */
 public class VariableMap extends RangeMap<String> {
 
-
     /**
      * Constructs a new empty variable map.
      */

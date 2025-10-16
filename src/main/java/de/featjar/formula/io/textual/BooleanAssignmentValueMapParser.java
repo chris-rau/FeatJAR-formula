@@ -126,13 +126,13 @@ public class BooleanAssignmentValueMapParser {
             StringBuilder stringBuilder = new StringBuilder();
             LinkedHashMap<Integer, Boolean> literals = entry.getKey().getAll();
             for (Integer literal : literals.keySet()) {
-                String literalString = variableMap.get(literal).orElseLog(Log.Verbosity.WARNING);
-                if (literals.get(literal)) {
-                    stringBuilder.append("+");
-                } else {
-                    stringBuilder.append("-");
+                String prefix = "+";
+                if (literal < 0) {
+                    prefix = "-";
+                    literal *= -1;
                 }
-                stringBuilder.append(literalString).append(LITERAL_SEPARATOR);
+                String literalString = variableMap.get(literal).orElseLog(Log.Verbosity.WARNING);
+                stringBuilder.append(prefix).append(literalString).append(LITERAL_SEPARATOR);
             }
             if (stringBuilder.charAt(stringBuilder.length() - 1) == LITERAL_SEPARATOR) {
                 stringBuilder.deleteCharAt(stringBuilder.length() - 1);
