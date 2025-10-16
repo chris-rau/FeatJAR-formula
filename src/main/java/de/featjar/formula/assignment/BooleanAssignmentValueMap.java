@@ -153,4 +153,8 @@ public class BooleanAssignmentValueMap implements Iterable<Map.Entry<BooleanAssi
         variableMap = newVariables;
         return this;
     }
+
+    public BooleanAssignmentValueMap adapt(VariableMap newVariables) {
+        return adapt(newVariables, false);
+    }
 }
